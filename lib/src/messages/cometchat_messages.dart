@@ -41,6 +41,7 @@ class CometChatMessages extends StatefulWidget {
       this.disableSoundForMessages,
       this.theme,
       this.threadedMessagesConfiguration,
+      this.newMessageBannerView,
       this.hideDetails,
       this.messageComposerKey,
       this.auxiliaryHeaderMenu})
@@ -123,6 +124,10 @@ class CometChatMessages extends StatefulWidget {
 
   ///[auxiliaryHeaderMenu] is the place in the [CometChatMessageHeader] where the calling buttons are shown if the [CometChatCallingExtension] is enabled
   final Widget? auxiliaryHeaderMenu;
+
+  ///[newMessageBannerView] to set custom new message banner
+  final Widget Function(CometChatMessageListController controller,
+      BuildContext context, CometChatTheme theme)? newMessageBannerView;
 
   @override
   State<CometChatMessages> createState() => _CometChatMessagesState();
@@ -222,6 +227,7 @@ class _CometChatMessagesState extends State<CometChatMessages> {
     return widget.messageListView != null
         ? widget.messageListView!(controller.user, controller.group, context)
         : CometChatMessageList(
+            newMessageBannerView: widget.newMessageBannerView,
             user: controller.user,
             group: controller.group,
             alignment: widget.messageListConfiguration.alignment ??

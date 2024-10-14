@@ -63,6 +63,7 @@ class CometChatMessageList extends StatefulWidget {
     this.onError,
     this.theme,
     this.disableReceipt,
+    this.newMessageBannerView,
     this.hideReceipt,
     this.messageInformationConfiguration,
     this.dateSeparatorStyle,
@@ -189,6 +190,10 @@ class CometChatMessageList extends StatefulWidget {
   ///and also disables logic executed inside onMessagesRead and onMessagesDelivered listeners
   @Deprecated('The property disableReceipt is deprecated and will be removed in the future releases. Use hideReceipt instead.')
   final bool? disableReceipt;
+
+  ///[newMessageBannerView] sets custom view for new message banner
+  final Widget Function(CometChatMessageListController controller,
+      BuildContext context, CometChatTheme theme)? newMessageBannerView;
 
   ///[hideReceipt] controls visibility of read receipts
   final bool? hideReceipt;
@@ -988,6 +993,10 @@ class _CometChatMessageListState extends State<CometChatMessageList> {
 
   Widget _getNewMessageBanner(CometChatMessageListController controller,
       BuildContext context, CometChatTheme theme) {
+    if(widget.newMessageBannerView != null) {
+      return widget.newMessageBannerView!(controller, context, theme);
+    }
+
     return Align(
       alignment: Alignment.topCenter,
       child: GestureDetector(
