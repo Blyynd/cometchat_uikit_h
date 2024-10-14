@@ -554,7 +554,7 @@ class _CometChatMessagesState extends State<CometChatMessages> {
                             child: GestureDetector(
                                 onTap: () {
                                   FocusScopeNode currentFocus =
-                                      FocusScope.of(context);
+                                  FocusScope.of(context);
 
                                   if (!currentFocus.hasPrimaryFocus) {
                                     currentFocus.unfocus();
@@ -563,20 +563,10 @@ class _CometChatMessagesState extends State<CometChatMessages> {
                                 child: getMessageList(value, context))),
 
                         //-----message composer-----
-                        if (widget.hideMessageComposer == false &&
-                            value.composerPlaceHolder != null)
-                          value.composerPlaceHolder ?? const SizedBox(),
+                        if (widget.hideMessageComposer == false)
+                          getMessageComposer(value, context)
                       ],
                     ),
-                    Positioned.fill(
-                        child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Stack(
-                              children: [
-                                if (widget.hideMessageComposer == false)
-                                  getMessageComposer(value, context)
-                              ],
-                            ))),
                     if (value.isOverlayOpen == true)
                       ...value.liveAnimationList
                   ],
