@@ -20,11 +20,11 @@ dependencies:
   url_launcher: ^6.1.12
   cometchat_uikit_shared:
     git:
-      url: https://github.com/Blyynd/cometchat_uikit_shared_x_blyynd.git
+      url: https://github.com/Blyynd/cometchat_shared_h.git
       ref: master
   cometchat_sdk:
     git:
-      url: https://github.com/Blyynd/cometchat_uikit_shared_x_blyynd.git
+      url: https://github.com/Blyynd/cometchat_sdk_h.git
       ref: master
 
 dev_dependencies:
