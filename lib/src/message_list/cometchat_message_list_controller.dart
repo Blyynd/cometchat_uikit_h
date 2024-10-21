@@ -389,23 +389,6 @@ BaseMessage? lastParticipantMessage;
 
   @override
   void onMessagesDelivered(MessageReceipt messageReceipt) {
-    if (disableReceipt != true && user != null) {
-      for (int i = 0; i < list.length; i++) {
-        if (messageReceipt.receiptType == ReceiptTypeConstants.delivered &&
-            list[i].sender?.uid == loggedInUser?.uid) {
-          if (i == 0 || list[i].deliveredAt == null) {
-            list[i].deliveredAt = messageReceipt.deliveredAt;
-          } else {
-            break;
-          }
-        }
-      }
-      update();
-    }
-  }
-
-   @override
-  void onMessagesDelivered(MessageReceipt messageReceipt) {
     if(disableReceipt == true) return;
 
     if (user != null) {
