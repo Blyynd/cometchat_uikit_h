@@ -404,9 +404,46 @@ BaseMessage? lastParticipantMessage;
     }
   }
 
+   @override
+  void onMessagesDelivered(MessageReceipt messageReceipt) {
+    if(disableReceipt == true) return;
+
+    if (user != null) {
+      for (int i = 0; i < list.length; i++) {
+        if (messageReceipt.receiptType == ReceiptTypeConstants.delivered &&
+            list[i].sender?.uid == loggedInUser?.uid) {
+          if (i == 0 || list[i].deliveredAt == null) {
+            list[i].deliveredAt = messageReceipt.deliveredAt;
+          } else {
+            break;
+          }
+        }
+      }
+      update();
+    }
+
+    if(group != null) {
+      for (int i = 0; i < list.length; i++) {
+        BaseMessage message = list[i];
+
+        if (messageReceipt.receiptType == ReceiptTypeConstants.delivered &&
+            message.receiverUid == group?.guid) {
+          if (i == 0 || message.deliveredAt == null) {
+            message.deliveredAt = messageReceipt.deliveredAt;
+          } else {
+            break;
+          }
+        }
+      }
+      update();
+    }
+  }
+
   @override
   void onMessagesRead(MessageReceipt messageReceipt) {
-    if (disableReceipt != true && user != null) {
+    if(disableReceipt == true) return;
+
+    if(user != null) {
       for (int i = 0; i < list.length; i++) {
         if (messageReceipt.receiptType == ReceiptTypeConstants.read &&
             list[i].sender?.uid == loggedInUser?.uid) {
@@ -420,16 +457,16 @@ BaseMessage? lastParticipantMessage;
       }
       update();
     }
-  }
 
-  @override
-  void onMessagesDeliveredToAll(MessageReceipt messageReceipt) {
-    if (disableReceipt != true && messageReceipt.receiverType == ReceiverTypeConstants.group) {
+    if(group != null) {
       for (int i = 0; i < list.length; i++) {
-        if (list[i].id == messageReceipt.messageId &&
-            messageReceipt.receiptType == ReceiptTypeConstants.deliveredToAll) {
-          if (i == 0 || list[i].deliveredAt == null) {
-            list[i].deliveredAt = messageReceipt.deliveredAt;
+        BaseMessage message = list[i];
+
+        if (messageReceipt.receiptType == ReceiptTypeConstants.read &&
+            message.receiverUid == group?.guid) {
+          if (i == 0 || message.readAt == null) {
+            message.readAt = messageReceipt.readAt;
+            message.deliveredAt ??= messageReceipt.readAt;
           } else {
             break;
           }
