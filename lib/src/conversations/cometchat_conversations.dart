@@ -416,7 +416,7 @@ class CometChatConversations extends StatelessWidget {
       if (seenIds.contains(conversation.conversationId)) {
         return true; // Remove the duplicate
       } else {
-        seenIds.add(conversation.id); 
+        seenIds.add(conversation.conversationId); 
         return false; 
       }
     });
