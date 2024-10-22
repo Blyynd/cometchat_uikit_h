@@ -679,10 +679,12 @@ class CometChatConversationsController
     if (matchingIndex != -1) {
       if (isTypingStarted == true) {
         typingMap[list[matchingIndex].conversationId!] = typingIndicator;
+        list[matchingIndex].isTyping = true;  
       } else {
         if (typingMap.containsKey(list[matchingIndex].conversationId!)) {
           typingMap.remove(list[matchingIndex].conversationId!);
         }
+        list[matchingIndex].isTyping = false;  
       }
       update();
     }
