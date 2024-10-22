@@ -664,27 +664,44 @@ class CometChatConversationsController
   @override
   setTypingIndicator(
       TypingIndicator typingIndicator, bool isTypingStarted) async {
-    int matchingIndex;
-    if (typingIndicator.receiverType == ReceiverTypeConstants.user) {
-      matchingIndex = list.indexWhere((Conversation conversation) =>
-          (conversation.conversationType == ReceiverTypeConstants.user &&
-              (conversation.conversationWith as User).uid ==
-                  typingIndicator.sender.uid));
-    } else {
-      matchingIndex = list.indexWhere((Conversation conversation) =>
-          (conversation.conversationType == ReceiverTypeConstants.group &&
-              (conversation.conversationWith as Group).guid ==
-                  typingIndicator.receiverId));
-    }
+    int matchingIndex = -1;
+
+    matchingIndex = list.indexWhere((Conversation conversation) {
+      if (conversation.conversationWith is! Group) return false;
+      Group group = conversation.conversationWith as Group;
+      if(group.guid == "1") return false;
+
+      // Safely check for metadata
+      if (group.metadata?.isEmpty ?? true) return false;
+
+      try {
+        // Safely parse metadata
+        CometGroupMetadata metadata = CometGroupMetadata
+            .fromMap(group.metadata!);
+
+        // Safely get user metadata
+        CometUserMetadata? userMetadata = metadata
+            .getSenderMetadata(typingIndicator.sender.uid);
+        if (userMetadata == null) return false;
+
+        // Compare UUIDs
+        return userMetadata.uuid == typingIndicator.sender.uid;
+      } catch (e) {
+        // Handle any parsing errors
+        print('Error parsing metadata: $e');
+        return false;
+      }
+    });
+
     if (matchingIndex != -1) {
       if (isTypingStarted == true) {
         typingMap[list[matchingIndex].conversationId!] = typingIndicator;
-        list[matchingIndex].isTyping = true;  
+        list[matchingIndex].isTyping = true;
       } else {
         if (typingMap.containsKey(list[matchingIndex].conversationId!)) {
           typingMap.remove(list[matchingIndex].conversationId!);
         }
-        list[matchingIndex].isTyping = false;  
+        list[matchingIndex].isTyping = false;
       }
       update();
     }
@@ -967,3 +984,140 @@ class CometChatConversationsController
     return user!=null && (disableUsersPresence == true || !userIsNotBlocked(user));
   }
 }
+
+
+class CometGroupMetadata {
+  CometUserMetadata user1;
+  CometUserMetadata user2;
+  String? requestType;
+  String? version;
+  bool? isSafeLockOn;
+
+  CometGroupMetadata({
+    required this.user1,
+    required this.user2,
+    this.requestType = "",
+    this.version,
+    this.isSafeLockOn,
+  });
+
+  factory CometGroupMetadata.fromMap(Map<String, dynamic> map) {
+    String? version = map['version'];
+    bool isOldVersion = version == null;
+
+    // -------------------------------------------------------------------------
+    // old model < 3.2.44
+    if(isOldVersion) {
+      String requestType = map['requestType'] ?? "";
+      Map<String, dynamic> userMaps = Map<String, dynamic>.from(map)
+        ..remove('requestType');
+
+      List<String> keys = userMaps.keys.toList();
+
+      return CometGroupMetadata(
+        user1: CometUserMetadata.fromMap(userMaps[keys[0]]),
+        user2: CometUserMetadata.fromMap(userMaps[keys[1]]),
+        requestType: requestType,
+        // true by default on old groups
+        isSafeLockOn: true,
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // new model
+    // later filter by version if changes occur
+    String requestType = map['requestType'] ?? "";
+    bool isSafeLockOn = map['isSafeLockOn'] ?? false;
+    Map<String, dynamic> userMaps = map['users'];
+    List<String> keys = userMaps.keys.toList();
+    CometUserMetadata user1 = CometUserMetadata.fromMap(userMaps[keys[0]]);
+    CometUserMetadata user2 = CometUserMetadata.fromMap(userMaps[keys[1]]);
+
+    return CometGroupMetadata(
+      user1: user1,
+      user2: user2,
+      requestType: requestType,
+      version: version,
+      isSafeLockOn: isSafeLockOn,
+    );
+    // -------------------------------------------------------------------------
+  }
+
+  String getReceiverId(String uuid) {
+    if (user1.uuid == uuid) {
+      return user2.uuid;
+    } else {
+      return user1.uuid;
+    }
+  }
+
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> users = {
+      user1.uuid: user1.toMap(),
+      user2.uuid: user2.toMap(),
+    };
+
+    Map<String, dynamic> map = {
+      "users" : users,
+      "requestType": requestType ?? "",
+      "version": version,
+      "isSafeLockOn" : isSafeLockOn ?? true,
+    };
+
+    return map;
+  }
+
+  CometUserMetadata getSenderMetadata(String uuid) {
+    if (user1.uuid == uuid) {
+      return user1;
+    } else {
+      return user2;
+    }
+  }
+
+  setSenderMetadata(String uuid, CometUserMetadata metadata) {
+    if (user1.uuid == uuid) {
+      user1 = metadata;
+    } else {
+      user2 = metadata;
+    }
+  }
+}
+
+class CometUserMetadata {
+  String username;
+  String fcmToken;
+  String uuid;
+  int? openedOn;
+
+  CometUserMetadata({
+    required this.username,
+    required this.fcmToken,
+    required this.uuid,
+    this.openedOn
+  });
+
+  factory CometUserMetadata.fromMap(Map<String, dynamic> map) {
+    return CometUserMetadata(
+      username: map['username'],
+      fcmToken: map['fcmToken'],
+      uuid: map['uuid'],
+      openedOn: map['openedOn'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> map = {
+      "username": username,
+      "fcmToken": fcmToken,
+      "uuid": uuid
+    };
+
+    if(openedOn != null) {
+      map['openedOn'] = openedOn;
+    }
+
+    return map;
+  }
+}
+
