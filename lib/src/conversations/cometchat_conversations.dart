@@ -409,6 +409,19 @@ class CometChatConversations extends StatelessWidget {
     }
   }
 
+  void removeDuplicateConversations(List<Conversation> conversations) {
+    final Set<String> seenIds = {};
+  
+    conversations.removeWhere((conversation) {
+      if (seenIds.contains(conversation.conversationId)) {
+        return true; // Remove the duplicate
+      } else {
+        seenIds.add(conversation.id); 
+        return false; 
+      }
+    });
+  }
+
   Widget _getNoConversationIndicator(
       BuildContext context, CometChatTheme theme) {
     if (emptyStateView != null) {
@@ -504,6 +517,8 @@ class CometChatConversations extends StatelessWidget {
           //----------- empty list widget-----------
           return _getNoConversationIndicator(context, theme);
         } else {
+          removeDuplicateConversations(value.list);
+
           return ListView.builder(
             controller: controller,
             itemCount:
