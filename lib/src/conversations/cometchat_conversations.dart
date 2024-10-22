@@ -413,7 +413,7 @@ class CometChatConversations extends StatelessWidget {
     final Set<String> seenIds = {};
   
     conversations.removeWhere((conversation) {
-      if(conversation.conversationId == null) return;
+      if(conversation.conversationId == null) return false;
       
       if (seenIds.contains(conversation.conversationId!)) {
         return true; // Remove the duplicate
