@@ -1041,7 +1041,7 @@ class CometGroupMetadata {
       user1: user1,
       user2: user2,
       requestType: requestType,
-      version: version ?? AppPackageInfo.instance.version,
+      version: version ?? "CC 4.5.23",
       isSafeLockOn: isSafeLockOn,
     );
     // -------------------------------------------------------------------------
