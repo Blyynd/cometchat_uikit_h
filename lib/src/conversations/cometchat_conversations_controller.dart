@@ -1003,7 +1003,7 @@ class CometGroupMetadata {
 
   factory CometGroupMetadata.fromMap(Map<String, dynamic> map) {
     String? version = map['version'];
-    bool isOldVersion = version == null;
+    bool isOldVersion = !map.containsKey('users');
 
     // -------------------------------------------------------------------------
     // old model < 3.2.44
@@ -1011,6 +1011,10 @@ class CometGroupMetadata {
       String requestType = map['requestType'] ?? "";
       Map<String, dynamic> userMaps = Map<String, dynamic>.from(map)
         ..remove('requestType');
+      userMaps = Map<String, dynamic>.from(userMaps)
+        ..remove('users');
+      userMaps = Map<String, dynamic>.from(userMaps)
+        ..remove('isSafeLockOn');
 
       List<String> keys = userMaps.keys.toList();
 
@@ -1019,7 +1023,7 @@ class CometGroupMetadata {
         user2: CometUserMetadata.fromMap(userMaps[keys[1]]),
         requestType: requestType,
         // true by default on old groups
-        isSafeLockOn: true,
+        isSafeLockOn: map['isSafeLockOn'] ?? true
       );
     }
 
@@ -1027,7 +1031,7 @@ class CometGroupMetadata {
     // new model
     // later filter by version if changes occur
     String requestType = map['requestType'] ?? "";
-    bool isSafeLockOn = map['isSafeLockOn'] ?? false;
+    bool isSafeLockOn = map['isSafeLockOn'] ?? true;
     Map<String, dynamic> userMaps = map['users'];
     List<String> keys = userMaps.keys.toList();
     CometUserMetadata user1 = CometUserMetadata.fromMap(userMaps[keys[0]]);
@@ -1037,7 +1041,7 @@ class CometGroupMetadata {
       user1: user1,
       user2: user2,
       requestType: requestType,
-      version: version,
+      version: version ?? AppPackageInfo.instance.version,
       isSafeLockOn: isSafeLockOn,
     );
     // -------------------------------------------------------------------------
