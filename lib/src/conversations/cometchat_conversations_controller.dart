@@ -1090,13 +1090,11 @@ class CometGroupMetadata {
 
 class CometUserMetadata {
   String username;
-  String fcmToken;
   String uuid;
   int? openedOn;
 
   CometUserMetadata({
     required this.username,
-    required this.fcmToken,
     required this.uuid,
     this.openedOn
   });
@@ -1104,7 +1102,6 @@ class CometUserMetadata {
   factory CometUserMetadata.fromMap(Map<String, dynamic> map) {
     return CometUserMetadata(
       username: map['username'],
-      fcmToken: map['fcmToken'],
       uuid: map['uuid'],
       openedOn: map['openedOn'],
     );
@@ -1113,7 +1110,6 @@ class CometUserMetadata {
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       "username": username,
-      "fcmToken": fcmToken,
       "uuid": uuid
     };
 
