@@ -132,7 +132,7 @@ class CometChatMessages extends StatefulWidget {
       BuildContext context, CometChatTheme theme)? newMessageBannerView;
 
   ///[onErrorCallback] called when the list can't load
-  final VoidCallback onErrorCallback;
+  final VoidCallback? onErrorCallback;
 
   @override
   State<CometChatMessages> createState() => _CometChatMessagesState();
