@@ -44,7 +44,9 @@ class CometChatMessages extends StatefulWidget {
       this.newMessageBannerView,
       this.hideDetails,
       this.messageComposerKey,
-      this.auxiliaryHeaderMenu})
+      this.auxiliaryHeaderMenu,
+      this.onErrorCallback, 
+      })
       : assert(user != null || group != null,
             "One of user or group should be passed"),
         assert(user == null || group == null,
@@ -128,6 +130,9 @@ class CometChatMessages extends StatefulWidget {
   ///[newMessageBannerView] to set custom new message banner
   final Widget Function(CometChatMessageListController controller,
       BuildContext context, CometChatTheme theme)? newMessageBannerView;
+
+  ///[onErrorCallback] called when the list can't load
+  final VoidCallback onErrorCallback;
 
   @override
   State<CometChatMessages> createState() => _CometChatMessagesState();
@@ -306,6 +311,7 @@ class _CometChatMessagesState extends State<CometChatMessages> {
                 widget.messageListConfiguration.reactionsConfiguration,
             favoriteReactions:
                 widget.messageListConfiguration.favoriteReactions,
+            onErrorCallback: widget.onErrorCallback,
           );
   }
 
