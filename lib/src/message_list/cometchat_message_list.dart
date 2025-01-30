@@ -236,7 +236,7 @@ class CometChatMessageList extends StatefulWidget {
   final bool? disableMentions;
 
   ///[onErrorCallback] called when the list can't load
-  final VoidCallback onErrorCallback;
+  final VoidCallback? onErrorCallback;
 
   @override
   State<CometChatMessageList> createState() => _CometChatMessageListState();
@@ -1044,8 +1044,8 @@ class _CometChatMessageListState extends State<CometChatMessageList> {
         if (value.hasError == true) {
             WidgetsBinding.instance
               .addPostFrameCallback((_) {
-            if(onErrorCallback != null) {
-              onErrorCallback!();
+            if(widget.onErrorCallback != null) {
+              widget.onErrorCallback!();
               return;
             }
 
