@@ -78,6 +78,7 @@ class CometChatConversations extends StatelessWidget {
     this.hideAppbar = false,
     this.disableMentions,
     this.textFormatters,
+    this.onErrorCallback,
   }) : conversationsController = CometChatConversationsController(
           conversationsBuilderProtocol: conversationsProtocol ??
               UIConversationsBuilder(
@@ -245,6 +246,9 @@ class CometChatConversations extends StatelessWidget {
   final List<CometChatTextFormatter>? textFormatters;
 
   final RxBool _isSelectionOn = false.obs;
+
+  ///[onErrorCallback] called when the list can't load
+  final VoidCallback onErrorCallback;
 
   Widget getDefaultItem(
       Conversation conversation,
@@ -510,7 +514,14 @@ class CometChatConversations extends StatelessWidget {
             return errorStateView!(context);
           }
           WidgetsBinding.instance
-              .addPostFrameCallback((_) => _showError(value, context, theme));
+              .addPostFrameCallback((_) {
+                if(onErrorCallback != null) {
+                  onErrorCallback!();
+                  return;
+                }
+                
+                _showError(value, context, theme);
+              });
 
           return _getLoadingIndicator(context, theme);
         } else if (value.isLoading == true && (value.list.isEmpty)) {
