@@ -248,7 +248,7 @@ class CometChatConversations extends StatelessWidget {
   final RxBool _isSelectionOn = false.obs;
 
   ///[onErrorCallback] called when the list can't load
-  final VoidCallback onErrorCallback;
+  final VoidCallback? onErrorCallback;
 
   Widget getDefaultItem(
       Conversation conversation,
