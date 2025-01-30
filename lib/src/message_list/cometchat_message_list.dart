@@ -77,6 +77,7 @@ class CometChatMessageList extends StatefulWidget {
     this.emojiKeyboardStyle,
     this.textFormatters,
     this.disableMentions,
+    this.onErrorCallback,  
   })  : assert(user != null || group != null,
             "One of user or group should be passed"),
         assert(user == null || group == null,
@@ -233,6 +234,9 @@ class CometChatMessageList extends StatefulWidget {
 
   ///[disableMentions] disables formatting of mentions in the subtitle of the conversation
   final bool? disableMentions;
+
+  ///[onErrorCallback] called when the list can't load
+  final VoidCallback onErrorCallback;
 
   @override
   State<CometChatMessageList> createState() => _CometChatMessageListState();
@@ -1038,8 +1042,15 @@ class _CometChatMessageListState extends State<CometChatMessageList> {
         }
 
         if (value.hasError == true) {
-          WidgetsBinding.instance
-              .addPostFrameCallback((_) => _showError(value, context, theme));
+            WidgetsBinding.instance
+              .addPostFrameCallback((_) {
+            if(onErrorCallback != null) {
+              onErrorCallback!();
+              return;
+            }
+
+            _showError(value, context, theme);
+          });
 
           if (widget.errorStateView != null) {
             return widget.errorStateView!(context);
